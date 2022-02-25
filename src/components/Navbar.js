@@ -157,10 +157,7 @@ const Navbar = () => {
 							</Box>
 						) : (
 							<Box sx={{ display: "flex", alignItems: "center", flexGrow: 0 }}>
-								<Button
-									marginRight={3}
-									sx={{ my: 2, color: "white", display: "block" }}
-								>
+								<Button sx={{ my: 2, color: "white", display: "block" }}>
 									<Link
 										to="/register"
 										style={{ textDecoration: "none", color: "white" }}
@@ -168,10 +165,7 @@ const Navbar = () => {
 										Sign Up
 									</Link>
 								</Button>
-								<Button
-									marginRight={3}
-									sx={{ my: 2, color: "white", display: "block" }}
-								>
+								<Button sx={{ my: 2, color: "white", display: "block" }}>
 									<Link
 										to="/login"
 										style={{ textDecoration: "none", color: "white" }}
