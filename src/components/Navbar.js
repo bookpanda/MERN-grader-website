@@ -51,7 +51,7 @@ const Navbar = () => {
 							variant="h6"
 							noWrap
 							component="div"
-							sx={{ mr: 2, display: { xs: "none", md: "flex" } }}
+							sx={{ mr: 5, display: { xs: "none", md: "flex" } }}
 						>
 							CrackNCode
 						</Typography>
