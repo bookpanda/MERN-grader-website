@@ -7,11 +7,13 @@ const connectDB = require("./db/connect");
 
 const authRouter = require("./routes/auth");
 
+const notFoundMiddleware = require("./middleware/not-found");
 const errorHandlerMiddleware = require("./middleware/error-handler");
 
 server.use(express.json());
 server.use("/", authRouter);
 
+server.use(notFoundMiddleware);
 server.use(errorHandlerMiddleware);
 
 const port = process.env.PORT || 5000;
