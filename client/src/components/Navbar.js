@@ -22,19 +22,26 @@ const pages = [
 	{ name: "Task", link: "/tasks" },
 	{ name: "Submissions", link: "/submissions" },
 ];
-const settings = ["Profile", "Logout"];
+const settings = [
+	{ name: "Profile", link: "/profile" },
+	{ name: "Logout", link: "/logout" },
+];
 
 const Navbar = () => {
 	const [anchorElNav, setAnchorElNav] = React.useState(null);
 	const [anchorElUser, setAnchorElUser] = React.useState(null);
 
-	const { user } = useAppContext();
+	const { user, logoutUser } = useAppContext();
 
 	const handleOpenNavMenu = (event) => {
 		setAnchorElNav(event.currentTarget);
 	};
 	const handleOpenUserMenu = (event) => {
 		setAnchorElUser(event.currentTarget);
+	};
+	const handleUser = (event, name) => {
+		setAnchorElUser(event.currentTarget);
+		if (name === "Logout") logoutUser();
 	};
 
 	const handleCloseNavMenu = () => {
@@ -152,8 +159,11 @@ const Navbar = () => {
 									onClose={handleCloseUserMenu}
 								>
 									{settings.map((setting) => (
-										<MenuItem key={setting} onClick={handleCloseUserMenu}>
-											<Typography textAlign="center">{setting}</Typography>
+										<MenuItem
+											key={setting.name}
+											onClick={(event) => handleUser(event, setting.name)}
+										>
+											<Typography textAlign="center">{setting.name}</Typography>
 										</MenuItem>
 									))}
 								</Menu>

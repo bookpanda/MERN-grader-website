@@ -9,6 +9,7 @@ import {
 	LOGIN_USER_BEGIN,
 	LOGIN_USER_SUCCESS,
 	LOGIN_USER_ERROR,
+	LOGOUT_USER,
 } from "./actions";
 
 const accessToken = localStorage.getItem("accessToken");
@@ -64,8 +65,15 @@ const AppProvider = ({ children }) => {
 		clearAlert();
 	};
 
+	const logoutUser = () => {
+		dispatch({ type: LOGOUT_USER });
+		removeUserFromLocalStorage();
+	};
+
 	return (
-		<AppContext.Provider value={{ ...state, displayAlert, loginUser }}>
+		<AppContext.Provider
+			value={{ ...state, displayAlert, loginUser, logoutUser }}
+		>
 			{children}
 		</AppContext.Provider>
 	);
