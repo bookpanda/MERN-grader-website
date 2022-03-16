@@ -31,12 +31,22 @@ UserSchema.pre("save", async function () {
 	this.password = await bcrypt.hash(this.password, salt);
 });
 
-UserSchema.methods.createJWT = function () {
+UserSchema.methods.createAccessToken = function () {
 	return jwt.sign(
 		{ userId: this._id, name: this.name },
-		process.env.JWT_SECRET,
+		process.env.ACCESS_TOKEN_SECRET,
 		{
-			expiresIn: process.env.JWT_LIFETIME,
+			expiresIn: process.env.ACCESS_TOKEN_LIFETIME,
+		}
+	);
+};
+
+UserSchema.methods.createRefreshToken = function () {
+	return jwt.sign(
+		{ userId: this._id, name: this.name },
+		process.env.REFRESH_TOKEN_SECRET,
+		{
+			expiresIn: process.env.REFRESH_TOKEN_LIFETIME,
 		}
 	);
 };
