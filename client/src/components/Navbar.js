@@ -13,6 +13,8 @@ import Tooltip from "@mui/material/Tooltip";
 import MenuItem from "@mui/material/MenuItem";
 import { ThemeProvider } from "@mui/material/styles";
 import { Link } from "react-router-dom";
+
+import { useAppContext } from "../context/appContext";
 import theme from "../theme";
 
 const pages = [
@@ -25,7 +27,8 @@ const settings = ["Profile", "Logout"];
 const Navbar = () => {
 	const [anchorElNav, setAnchorElNav] = React.useState(null);
 	const [anchorElUser, setAnchorElUser] = React.useState(null);
-	const isLoggedIn = false;
+
+	const { user } = useAppContext();
 
 	const handleOpenNavMenu = (event) => {
 		setAnchorElNav(event.currentTarget);
@@ -124,12 +127,12 @@ const Navbar = () => {
 							))}
 						</Box>
 
-						{isLoggedIn ? (
+						{user ? (
 							<Box sx={{ display: "flex", alignItems: "center", flexGrow: 0 }}>
-								<Typography marginRight={3}>username</Typography>
+								<Typography marginRight={3}>{user.name}</Typography>
 								<Tooltip title="Open settings">
 									<IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-										<Avatar alt="tee" src="/static/images/avatar/2.jpg" />
+										<Avatar alt={user.name} src="/static/images/avatar/2.jpg" />
 									</IconButton>
 								</Tooltip>
 								<Menu

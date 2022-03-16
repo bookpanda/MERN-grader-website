@@ -3,7 +3,6 @@ require("express-async-errors");
 
 const express = require("express");
 const cookieParser = require("cookie-parser");
-const cors = require("cors");
 const server = express();
 const connectDB = require("./db/connect");
 
@@ -13,7 +12,6 @@ const userRouter = require("./routes/user");
 const notFoundMiddleware = require("./middleware/not-found");
 const errorHandlerMiddleware = require("./middleware/error-handler");
 
-server.use(cors({ origin: "http://localhost:3000", credentials: true }));
 server.use(express.json());
 server.use(cookieParser());
 server.use("/", authRouter);

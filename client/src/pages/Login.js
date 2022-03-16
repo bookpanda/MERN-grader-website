@@ -10,17 +10,37 @@ import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
 import { ThemeProvider } from "@mui/material/styles";
+
+import { useState } from "react";
+import { Alert } from "../components";
+import { useAppContext } from "../context/appContext";
 import theme from "../theme";
 
+const initialState = {
+	email: "",
+	password: "",
+};
+
 export default function Login() {
+	const [values, setValues] = useState(initialState);
+	const { user, isLoading, showAlert, displayAlert, loginUser } =
+		useAppContext();
+
+	const handleChange = (e) => {
+		setValues({ ...values, [e.target.name]: e.target.value });
+	};
 	const handleSubmit = (event) => {
 		event.preventDefault();
 		const data = new FormData(event.currentTarget);
 		// eslint-disable-next-line no-console
-		console.log({
-			email: data.get("email"),
-			password: data.get("password"),
-		});
+		const email = data.get("email");
+		const password = data.get("password");
+		if (!email || !password) {
+			displayAlert();
+			return;
+		}
+		const currentUser = { email, password };
+		loginUser(currentUser);
 	};
 
 	return (
@@ -35,7 +55,7 @@ export default function Login() {
 						alignItems: "center",
 					}}
 				>
-					<Typography component="h1" variant="h4">
+					<Typography component="h1" variant="h4" sx={{ mt: 3, mb: 2 }}>
 						Login
 					</Typography>
 					<Box
@@ -44,25 +64,30 @@ export default function Login() {
 						noValidate
 						sx={{ mt: 1 }}
 					>
+						{showAlert && <Alert />}
 						<TextField
 							margin="normal"
 							required
 							fullWidth
 							id="email"
 							label="Email Address"
-							name="email"
 							autoComplete="email"
 							autoFocus
+							name="email"
+							value={values.email}
+							onChange={handleChange}
 						/>
 						<TextField
 							margin="normal"
 							required
 							fullWidth
-							name="password"
 							label="Password"
 							type="password"
 							id="password"
 							autoComplete="current-password"
+							name="password"
+							value={values.password}
+							onChange={handleChange}
 						/>
 						<FormControlLabel
 							control={<Checkbox value="remember" color="primary" />}
