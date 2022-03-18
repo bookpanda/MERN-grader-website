@@ -39,8 +39,8 @@ const Navbar = () => {
 	const handleOpenUserMenu = (event) => {
 		setAnchorElUser(event.currentTarget);
 	};
-	const handleUser = (event, name) => {
-		setAnchorElUser(event.currentTarget);
+	const handleUser = (name) => {
+		setAnchorElUser(null);
 		if (name === "Logout") logoutUser();
 	};
 
@@ -161,7 +161,8 @@ const Navbar = () => {
 									{settings.map((setting) => (
 										<MenuItem
 											key={setting.name}
-											onClick={(event) => handleUser(event, setting.name)}
+											onClick={(event) => handleUser(setting.name)}
+											// onClick={handleCloseUserMenu}
 										>
 											<Typography textAlign="center">{setting.name}</Typography>
 										</MenuItem>
