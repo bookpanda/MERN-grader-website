@@ -6,6 +6,9 @@ import axios from "axios";
 import {
 	DISPLAY_ALERT,
 	CLEAR_ALERT,
+	REGISTER_USER_BEGIN,
+	REGISTER_USER_SUCCESS,
+	REGISTER_USER_ERROR,
 	LOGIN_USER_BEGIN,
 	LOGIN_USER_SUCCESS,
 	LOGIN_USER_ERROR,
@@ -49,6 +52,25 @@ const AppProvider = ({ children }) => {
 		localStorage.removeItem("accessToken");
 	};
 
+	const registerUser = async (currentUser) => {
+		dispatch({ type: REGISTER_USER_BEGIN });
+		try {
+			const response = await axios.post("/register", currentUser);
+			const { user, accessToken } = response.data;
+			dispatch({
+				type: REGISTER_USER_SUCCESS,
+				payload: { user, accessToken },
+			});
+			addUserToLocalStorage({ user, accessToken });
+		} catch (error) {
+			dispatch({
+				type: REGISTER_USER_ERROR,
+				payload: { msg: error.response.data.msg },
+			});
+		}
+		clearAlert();
+	};
+
 	const loginUser = async (currentUser) => {
 		dispatch({ type: LOGIN_USER_BEGIN });
 		try {
@@ -72,7 +94,7 @@ const AppProvider = ({ children }) => {
 
 	return (
 		<AppContext.Provider
-			value={{ ...state, displayAlert, loginUser, logoutUser }}
+			value={{ ...state, displayAlert, registerUser, loginUser, logoutUser }}
 		>
 			{children}
 		</AppContext.Provider>

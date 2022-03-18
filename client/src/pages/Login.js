@@ -11,7 +11,8 @@ import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
 import { ThemeProvider } from "@mui/material/styles";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { Alert } from "../components";
 import { useAppContext } from "../context/appContext";
 import theme from "../theme";
@@ -22,6 +23,7 @@ const initialState = {
 };
 
 export default function Login() {
+	const navigate = useNavigate();
 	const [values, setValues] = useState(initialState);
 	const { user, isLoading, showAlert, displayAlert, loginUser } =
 		useAppContext();
@@ -42,6 +44,14 @@ export default function Login() {
 		const currentUser = { email, password };
 		loginUser(currentUser);
 	};
+
+	useEffect(() => {
+		if (user) {
+			setTimeout(() => {
+				navigate("/");
+			}, 1000);
+		}
+	}, [user, navigate]);
 
 	return (
 		<ThemeProvider theme={theme}>

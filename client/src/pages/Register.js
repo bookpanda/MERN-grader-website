@@ -12,18 +12,46 @@ import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
+
+import { useState, useEffect } from "react";
+import { Alert } from "../components";
+import { useAppContext } from "../context/appContext";
+import { useNavigate } from "react-router-dom";
 import theme from "../theme";
 
+const initialState = {
+	email: "",
+	password: "",
+};
+
 export default function Register() {
+	const navigate = useNavigate();
+	const [values, setValues] = useState(initialState);
+	const { user, isLoading, showAlert, displayAlert, registerUser } =
+		useAppContext();
+
 	const handleSubmit = (event) => {
 		event.preventDefault();
 		const data = new FormData(event.currentTarget);
 		// eslint-disable-next-line no-console
-		console.log({
-			email: data.get("email"),
-			password: data.get("password"),
-		});
+		const name = data.get("name");
+		const email = data.get("email");
+		const password = data.get("password");
+		if (!name || !email || !password) {
+			displayAlert();
+			return;
+		}
+		const currentUser = { name, email, password };
+		registerUser(currentUser);
 	};
+
+	useEffect(() => {
+		if (user) {
+			setTimeout(() => {
+				navigate("/");
+			}, 1000);
+		}
+	}, [user, navigate]);
 
 	return (
 		<ThemeProvider theme={theme}>
@@ -37,7 +65,7 @@ export default function Register() {
 						alignItems: "center",
 					}}
 				>
-					<Typography component="h1" variant="h4">
+					<Typography component="h1" variant="h4" sx={{ mt: 3, mb: 2 }}>
 						Sign up
 					</Typography>
 					<Box
@@ -46,26 +74,16 @@ export default function Register() {
 						onSubmit={handleSubmit}
 						sx={{ mt: 3 }}
 					>
-						<Grid container spacing={2}>
-							<Grid item xs={12} sm={6}>
-								<TextField
-									autoComplete="given-name"
-									name="firstName"
-									required
-									fullWidth
-									id="firstName"
-									label="First Name"
-									autoFocus
-								/>
-							</Grid>
-							<Grid item xs={12} sm={6}>
+						{showAlert && <Alert />}
+						<Grid container spacing={2} marginTop={2}>
+							<Grid item xs={12}>
 								<TextField
 									required
 									fullWidth
-									id="lastName"
-									label="Last Name"
-									name="lastName"
-									autoComplete="family-name"
+									id="name"
+									label="Username"
+									name="name"
+									autoComplete="name"
 								/>
 							</Grid>
 							<Grid item xs={12}>
