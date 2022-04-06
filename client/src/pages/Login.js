@@ -17,6 +17,8 @@ import { Alert } from "../components";
 import { useAppContext } from "../context/appContext";
 import theme from "../theme";
 
+import { GoogleLogin } from "react-google-login";
+
 const initialState = {
 	email: "",
 	password: "",
@@ -25,8 +27,14 @@ const initialState = {
 export default function Login() {
 	const navigate = useNavigate();
 	const [values, setValues] = useState(initialState);
-	const { user, isLoading, showAlert, displayAlert, loginUser } =
-		useAppContext();
+	const {
+		user,
+		isLoading,
+		showAlert,
+		displayAlert,
+		loginUser,
+		sendGoogleToken,
+	} = useAppContext();
 
 	const handleChange = (e) => {
 		setValues({ ...values, [e.target.name]: e.target.value });
@@ -43,6 +51,11 @@ export default function Login() {
 		}
 		const currentUser = { email, password };
 		loginUser(currentUser);
+	};
+
+	const responseGoogle = (response) => {
+		console.log(response);
+		sendGoogleToken(response.tokenId);
 	};
 
 	useEffect(() => {
@@ -111,6 +124,24 @@ export default function Login() {
 						>
 							Sign In
 						</Button>
+						<GoogleLogin
+							clientId="2240931842-c0ikqfjglggqo8qa1visrbdkjbea0m34.apps.googleusercontent.com"
+							onSuccess={responseGoogle}
+							onFailure={responseGoogle}
+							cookiePolicy={"single_host_origin"}
+							render={(renderProps) => (
+								<Button
+									onClick={renderProps.onClick}
+									disabled={renderProps.disabled}
+									className="w-full max-w-xs font-bold shadow-sm rounded-lg py-3 bg-indigo-100 text-gray-800 flex items-center justify-center transition-all duration-300 ease-in-out focus:outline-none hover:shadow focus:shadow-sm focus:shadow-outline"
+								>
+									<div className=" p-2 rounded-full ">
+										<i className="fab fa-google " />
+									</div>
+									<span className="ml-4">Sign In with Google</span>
+								</Button>
+							)}
+						></GoogleLogin>
 						<Grid container>
 							<Grid item xs>
 								<Link href="#" variant="body2">

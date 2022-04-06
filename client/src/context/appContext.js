@@ -87,6 +87,23 @@ const AppProvider = ({ children }) => {
 		clearAlert();
 	};
 
+	const sendGoogleToken = async (tokenId) => {
+		try {
+			const { data } = await axios.post("/googlelogin", {
+				idToken: tokenId,
+			});
+			const { user, accessToken } = data;
+			dispatch({ type: LOGIN_USER_SUCCESS, payload: { user, accessToken } });
+			addUserToLocalStorage({ user, accessToken });
+		} catch (error) {
+			dispatch({
+				type: LOGIN_USER_ERROR,
+				payload: { msg: error.response.data.msg },
+			});
+		}
+		clearAlert();
+	};
+
 	const logoutUser = () => {
 		dispatch({ type: LOGOUT_USER });
 		removeUserFromLocalStorage();
@@ -94,7 +111,14 @@ const AppProvider = ({ children }) => {
 
 	return (
 		<AppContext.Provider
-			value={{ ...state, displayAlert, registerUser, loginUser, logoutUser }}
+			value={{
+				...state,
+				displayAlert,
+				registerUser,
+				loginUser,
+				sendGoogleToken,
+				logoutUser,
+			}}
 		>
 			{children}
 		</AppContext.Provider>
