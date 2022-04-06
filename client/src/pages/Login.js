@@ -54,7 +54,7 @@ export default function Login() {
 	};
 
 	const responseGoogle = (response) => {
-		console.log(response);
+		// console.log(response);
 		sendGoogleToken(response.tokenId);
 	};
 

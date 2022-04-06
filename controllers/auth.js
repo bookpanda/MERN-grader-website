@@ -57,25 +57,38 @@ const googleLogin = async (req, res) => {
 		idToken,
 		audience: process.env.GOOGLE_CLIENT,
 	});
-	const { email_verified, name, email } = response.payload;
+	console.log(response);
+	const { email_verified, name, email, picture: image } = response.payload;
 	if (email_verified) {
 		const findUser = await User.findOne({ email });
 		if (findUser) {
-			const accessToken = findUser.createAccessToken();
-			const refreshToken = findUser.createRefreshToken();
+			const updatedUser = await User.findOneAndUpdate(
+				{ email },
+				{ image },
+				{
+					new: true,
+					runValidators: true,
+				}
+			);
+			const accessToken = updatedUser.createAccessToken();
+			const refreshToken = updatedUser.createRefreshToken();
 			return res.json({
-				user: { name: findUser.name },
+				user: { name: updatedUser.name, image: updatedUser.image },
 				accessToken,
 				refreshToken,
 			});
 		} else {
 			let password = email + process.env.JWT_SECRET;
-			const user = await User.create({ name, email, password });
+			const user = await User.create({ name, email, password, image });
 			const accessToken = user.createAccessToken();
 			const refreshToken = user.createRefreshToken();
 			res
 				.status(200)
-				.json({ user: { name: user.name }, accessToken, refreshToken });
+				.json({
+					user: { name: user.name, image: user.image },
+					accessToken,
+					refreshToken,
+				});
 		}
 	} else {
 		return res.status(400).json({
