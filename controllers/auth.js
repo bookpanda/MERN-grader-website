@@ -1,4 +1,5 @@
 const User = require("../models/User");
+const axios = require("axios");
 const { BadRequestError, UnauthenticatedError } = require("../errors");
 
 const { OAuth2Client } = require("google-auth-library");
@@ -57,7 +58,6 @@ const googleLogin = async (req, res) => {
 		idToken,
 		audience: process.env.GOOGLE_CLIENT,
 	});
-	console.log(response);
 	const { email_verified, name, email, picture: image } = response.payload;
 	if (email_verified) {
 		const findUser = await User.findOne({ email });
@@ -82,13 +82,11 @@ const googleLogin = async (req, res) => {
 			const user = await User.create({ name, email, password, image });
 			const accessToken = user.createAccessToken();
 			const refreshToken = user.createRefreshToken();
-			res
-				.status(200)
-				.json({
-					user: { name: user.name, image: user.image },
-					accessToken,
-					refreshToken,
-				});
+			res.status(200).json({
+				user: { name: user.name, image: user.image },
+				accessToken,
+				refreshToken,
+			});
 		}
 	} else {
 		return res.status(400).json({
@@ -97,4 +95,85 @@ const googleLogin = async (req, res) => {
 	}
 };
 
-module.exports = { register, login, logout, googleLogin };
+const githubLogin = async (req, res, next) => {
+	const { code } = req.query;
+
+	if (!code) {
+		return res.json({ success: false, message: "Error: no code" });
+	}
+	const response = await axios.post(
+		"https://github.com/login/oauth/access_token",
+		{
+			client_id: process.env.GITHUB_CLIENT_ID,
+			client_secret: process.env.GITHUB_CLIENT_SECRET,
+			code: code,
+		},
+		{
+			headers: {
+				Accept: "application/json",
+			},
+		}
+	);
+	const accessToken = response.data.access_token;
+	const { data: userData } = await axios.get("https://api.github.com/user", {
+		headers: {
+			Authorization: `token ${accessToken}`,
+		},
+	});
+	const { data: emailData } = await axios.get(
+		"https://api.github.com/user/emails",
+		{
+			headers: {
+				Authorization: `token ${accessToken}`,
+			},
+		}
+	);
+
+	const { name, avatar_url: image } = userData;
+	const { verified: email_verified, email } = emailData[0];
+	if (email_verified) {
+		const findUser = await User.findOne({ email });
+		if (findUser) {
+			const updatedUser = await User.findOneAndUpdate(
+				{ email },
+				{ image },
+				{
+					new: true,
+					runValidators: true,
+				}
+			);
+			const accessToken = updatedUser.createAccessToken();
+			const refreshToken = updatedUser.createRefreshToken();
+			const user = { name: updatedUser.name, image: updatedUser.image };
+			return res.json({
+				user: { name: updatedUser.name, image: updatedUser.image },
+				accessToken,
+				refreshToken,
+			});
+		} else {
+			let password = email + process.env.JWT_SECRET;
+			const user = await User.create({ name, email, password, image });
+			const accessToken = user.createAccessToken();
+			const refreshToken = user.createRefreshToken();
+			res.status(200).json({
+				user: { name: user.name, image: user.image },
+				accessToken,
+				refreshToken,
+			});
+		}
+	} else {
+		return res.status(400).json({
+			error: "GitHub login failed. Please try again",
+		});
+	}
+
+	// res.redirect("http://localhost:3000/login");
+};
+
+module.exports = {
+	register,
+	login,
+	logout,
+	googleLogin,
+	githubLogin,
+};
