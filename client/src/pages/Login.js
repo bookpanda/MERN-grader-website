@@ -18,6 +18,7 @@ import { useAppContext } from "../context/appContext";
 import theme from "../theme";
 
 import { GoogleLogin } from "react-google-login";
+import FacebookLogin from "react-facebook-login/dist/facebook-login-render-props";
 
 const initialState = {
 	email: "",
@@ -34,6 +35,7 @@ export default function Login() {
 		displayAlert,
 		loginUser,
 		sendGoogleToken,
+		sendFacebookToken,
 		sendGithubToken,
 	} = useAppContext();
 
@@ -55,8 +57,11 @@ export default function Login() {
 	};
 
 	const responseGoogle = (response) => {
-		// console.log(response);
 		sendGoogleToken(response.tokenId);
+	};
+	const responseFacebook = (response) => {
+		console.log("login facebook: ", response);
+		sendFacebookToken(response.userID, response.accessToken);
 	};
 	const responseGithub = () => {
 		sendGithubToken();
@@ -146,6 +151,23 @@ export default function Login() {
 								</Button>
 							)}
 						></GoogleLogin>
+						<FacebookLogin
+							appId="2217201518427322"
+							autoLoad
+							callback={responseFacebook}
+							render={(renderProps) => (
+								<Button
+									onClick={renderProps.onClick}
+									disabled={renderProps.disabled}
+									className="w-full max-w-xs font-bold shadow-sm rounded-lg py-3 bg-indigo-100 text-gray-800 flex items-center justify-center transition-all duration-300 ease-in-out focus:outline-none hover:shadow focus:shadow-sm focus:shadow-outline"
+								>
+									<div className=" p-2 rounded-full ">
+										<i className="fab fa-google " />
+									</div>
+									<span className="ml-4">Sign In with Facebook</span>
+								</Button>
+							)}
+						/>
 						<Button
 							onClick={responseGithub}
 							className="w-full max-w-xs font-bold shadow-sm rounded-lg py-3 bg-indigo-100 text-gray-800 flex items-center justify-center transition-all duration-300 ease-in-out focus:outline-none hover:shadow focus:shadow-sm focus:shadow-outline"

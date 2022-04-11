@@ -96,6 +96,35 @@ const googleLogin = async (req, res) => {
 	}
 };
 
+const facebookLogin = async (req, res) => {
+	const { userID, accessToken_ } = req.body;
+	const url = `https://graph.facebook.com/v2.11/${userID}/?fields=id,name,email&access_token=${accessToken_}`;
+	try {
+		const { data } = await axios.get(url);
+		const { email, name, image } = response;
+		const findUser = await User.findOne({ email });
+		if (user) {
+			const accessToken = user.createAccessToken();
+			return res.json({
+				user: { name: user.name, image: user.image },
+				accessToken,
+			});
+		} else {
+			let password = email + process.env.JWT_SECRET;
+			const user = await User.create({ name, email, password, image });
+			const accessToken = user.createAccessToken();
+			res.status(200).json({
+				user: { name: user.name, image: user.image },
+				accessToken,
+			});
+		}
+	} catch (error) {
+		res.json({
+			error: "Facebook login failed. Try later",
+		});
+	}
+};
+
 const githubLogin = async (req, res, next) => {
 	const { code } = req.query;
 
@@ -200,6 +229,7 @@ module.exports = {
 	login,
 	logout,
 	googleLogin,
+	facebookLogin,
 	githubLogin,
 	githubCookie,
 };

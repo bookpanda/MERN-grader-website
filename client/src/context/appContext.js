@@ -104,6 +104,24 @@ const AppProvider = ({ children }) => {
 		clearAlert();
 	};
 
+	const sendFacebookToken = async (userID, accessToken_) => {
+		try {
+			const { data } = await axios.post("/facebooklogin", {
+				userID,
+				accessToken_,
+			});
+			const { user, accessToken } = data;
+			dispatch({ type: LOGIN_USER_SUCCESS, payload: { user, accessToken } });
+			addUserToLocalStorage({ user, accessToken });
+		} catch (error) {
+			dispatch({
+				type: LOGIN_USER_ERROR,
+				payload: { msg: error.response.data.msg },
+			});
+		}
+		clearAlert();
+	};
+
 	const sendGithubToken = async () => {
 		await window.location.assign(
 			"https://github.com/login/oauth/authorize?client_id=90fd6a484c0108821c77&scope=user:email"
@@ -137,6 +155,7 @@ const AppProvider = ({ children }) => {
 				registerUser,
 				loginUser,
 				sendGoogleToken,
+				sendFacebookToken,
 				sendGithubToken,
 				logoutUser,
 			}}
