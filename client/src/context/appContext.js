@@ -105,29 +105,22 @@ const AppProvider = ({ children }) => {
 	};
 
 	const sendGithubToken = async () => {
-		window.location.assign(
+		await window.location.assign(
 			"https://github.com/login/oauth/authorize?client_id=90fd6a484c0108821c77&scope=user:email"
 		);
-		console.log(window.location.search);
-		// try {
-		// 	const response = await axios.get(
-		// 		"https://github.com/login/oauth/authorize?client_id=90fd6a484c0108821c77&scope=user:email",
-		// 		{
-		// 			headers: {
-		// 				"Access-Control-Allow-Origin": "*",
-		// 			},
-		// 		}
-		// 	);
-		// 	console.log("frontend resp:", response);
-		// const { user, accessToken } = data;
-		// dispatch({ type: LOGIN_USER_SUCCESS, payload: { user, accessToken } });
-		// addUserToLocalStorage({ user, accessToken });
-		// } catch (error) {
-		// dispatch({
-		// 	type: LOGIN_USER_ERROR,
-		// 	payload: { msg: error.response.data.msg },
-		// });
-		// }
+		try {
+			const { data } = await axios.get("/auth/github/cookie", {
+				withCredentials: true,
+			});
+			const { user, accessToken } = data;
+			dispatch({ type: LOGIN_USER_SUCCESS, payload: { user, accessToken } });
+			addUserToLocalStorage({ user, accessToken });
+		} catch (error) {
+			dispatch({
+				type: LOGIN_USER_ERROR,
+				payload: { msg: error.response.data.msg },
+			});
+		}
 		clearAlert();
 	};
 

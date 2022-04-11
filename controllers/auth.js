@@ -1,4 +1,5 @@
 const User = require("../models/User");
+const jwt = require("jsonwebtoken");
 const axios = require("axios");
 const { BadRequestError, UnauthenticatedError } = require("../errors");
 
@@ -145,29 +146,53 @@ const githubLogin = async (req, res, next) => {
 			const accessToken = updatedUser.createAccessToken();
 			const refreshToken = updatedUser.createRefreshToken();
 			const user = { name: updatedUser.name, image: updatedUser.image };
-			return res.json({
-				user: { name: updatedUser.name, image: updatedUser.image },
-				accessToken,
-				refreshToken,
+			const userToken = jwt.sign(user, process.env.JWT_SECRET);
+			res.cookie("user", userToken, {
+				httpOnly: true,
+				domain: "localhost",
 			});
+			res.cookie("accessToken", accessToken, {
+				httpOnly: true,
+				domain: "localhost",
+			});
+			res.redirect("http://localhost:3000/login");
 		} else {
 			let password = email + process.env.JWT_SECRET;
-			const user = await User.create({ name, email, password, image });
-			const accessToken = user.createAccessToken();
-			const refreshToken = user.createRefreshToken();
-			res.status(200).json({
-				user: { name: user.name, image: user.image },
-				accessToken,
-				refreshToken,
+			const newUser = await User.create({ name, email, password, image });
+			const accessToken = newUser.createAccessToken();
+			const refreshToken = newUser.createRefreshToken();
+			const user = { name: newUser.name, image: newUser.image };
+			const userToken = jwt.sign(user, process.env.JWT_SECRET);
+			res.cookie("user", userToken, {
+				// httpOnly: true,
+				domain: "localhost",
 			});
+			res.cookie("accessToken", accessToken, {
+				// httpOnly: true,
+				domain: "localhost",
+			});
+			res.redirect("http://localhost:3000/login");
 		}
 	} else {
 		return res.status(400).json({
 			error: "GitHub login failed. Please try again",
 		});
 	}
+};
 
-	// res.redirect("http://localhost:3000/login");
+const githubCookie = (req, res) => {
+	const userCookie = req.cookies.user;
+	const accessTokenCookie = req.cookies.accessToken;
+	try {
+		const decodeUser = jwt.verify(userCookie, process.env.JWT_SECRET);
+		const decodeAccessToken = jwt.verify(
+			accessTokenCookie,
+			process.env.ACCESS_TOKEN_SECRET
+		);
+		return res.send({ user: decodeUser, accessToken: decodeAccessToken });
+	} catch (error) {
+		return res.send(null);
+	}
 };
 
 module.exports = {
@@ -176,4 +201,5 @@ module.exports = {
 	logout,
 	googleLogin,
 	githubLogin,
+	githubCookie,
 };
