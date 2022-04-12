@@ -185,6 +185,7 @@ const githubLogin = async (req, res, next) => {
 				domain: "localhost",
 			});
 			res.redirect("http://localhost:3000/login");
+			// res.end();
 		} else {
 			let password = email + process.env.JWT_SECRET;
 			const newUser = await User.create({ name, email, password, image });
@@ -201,6 +202,7 @@ const githubLogin = async (req, res, next) => {
 				domain: "localhost",
 			});
 			res.redirect("http://localhost:3000/login");
+			// res.end();
 		}
 	} else {
 		return res.status(400).json({
@@ -214,11 +216,7 @@ const githubCookie = (req, res) => {
 	const accessTokenCookie = req.cookies.accessToken;
 	try {
 		const decodeUser = jwt.verify(userCookie, process.env.JWT_SECRET);
-		const decodeAccessToken = jwt.verify(
-			accessTokenCookie,
-			process.env.ACCESS_TOKEN_SECRET
-		);
-		return res.send({ user: decodeUser, accessToken: decodeAccessToken });
+		return res.send({ user: decodeUser, accessToken: accessTokenCookie });
 	} catch (error) {
 		return res.send(null);
 	}

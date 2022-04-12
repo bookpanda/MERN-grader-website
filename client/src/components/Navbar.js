@@ -23,7 +23,7 @@ const pages = [
 	{ name: "Submissions", link: "/submissions" },
 ];
 const settings = [
-	{ name: "Profile", link: "/profile" },
+	// { name: "Profile", link: "/profile" },
 	{ name: "Logout", link: "/logout" },
 ];
 
@@ -171,14 +171,14 @@ const Navbar = () => {
 							</Box>
 						) : (
 							<Box sx={{ display: "flex", alignItems: "center", flexGrow: 0 }}>
-								<Button sx={{ my: 2, color: "white", display: "block" }}>
+								{/* <Button sx={{ my: 2, color: "white", display: "block" }}>
 									<Link
 										to="/register"
 										style={{ textDecoration: "none", color: "white" }}
 									>
 										Sign Up
 									</Link>
-								</Button>
+								</Button> */}
 								<Button sx={{ my: 2, color: "white", display: "block" }}>
 									<Link
 										to="/login"
